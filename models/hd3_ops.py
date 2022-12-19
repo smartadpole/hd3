@@ -205,8 +205,9 @@ def _prob2cornerflow(prob, normalize=True):
     avg_pool = nn.AvgPool2d(kernel_size=2, stride=1, padding=0)
     max_pool = nn.MaxPool2d(kernel_size=d - 1, stride=1, return_indices=True)
     out, indice = max_pool(avg_pool(pr))
-    indice += indice / (d - 1)  # in original coordinate
+    indice = indice + indice / (d - 1)  # in original coordinate
     indice = indice.squeeze().reshape(B, H, W).unsqueeze(1)
+    indice = indice.long()
     lt_prob = torch.gather(prob, 1, indice)
     lt_flow = indice2flow(indice, d).float()
     rt_prob = torch.gather(prob, 1, indice + 1)
